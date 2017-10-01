@@ -57,7 +57,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-I have some problems when adding the scrolling to the recycle view by max_id. I also face some problems when manually added the new composed twwet into the recycle view. I feel understanding the structure of recycle view is the key to solve them.
+I had some problems when adding the scrolling to the recycle view by max_id. I also faced some issue when manually adding the new composed tweet into the recycle view. Understanding the structure of recycle view is the key to solve them.
 
 ## Open-source libraries used
 
