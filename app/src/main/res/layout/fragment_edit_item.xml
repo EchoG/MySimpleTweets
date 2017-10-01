@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/btnCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="Cancel" />
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:text="Save" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="60dp"
+        android:background="@android:color/darker_gray"
+        android:id="@+id/view" />
+
+    <ImageView
+        android:id="@+id/currentUserImage"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignStart="@+id/view"
+        android:layout_below="@+id/view"
+        android:layout_marginTop="15dp"
+        app:srcCompat="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/currentUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/currentUserImage"
+        android:layout_marginBottom="14dp"
+        android:layout_toEndOf="@+id/currentUserImage"
+        android:text="TextView" />
+
+    <EditText
+        android:id="@+id/rvNewTweet"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_marginTop="15dp"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:layout_below="@+id/currentUserImage"
+        android:layout_alignStart="@+id/currentUserImage"
+        android:layout_alignEnd="@+id/view" />
+
+</RelativeLayout>
