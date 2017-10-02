@@ -27,6 +27,7 @@ public class TimelineActivity extends AppCompatActivity {
     ArrayList<Tweet> tweets;
     RecyclerView rvTweets;
     String screen_name;
+    String user_name;
     String image;
 
     private EndlessRecyclerViewScrollListener scrollListener;

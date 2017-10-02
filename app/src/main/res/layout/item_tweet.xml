@@ -37,4 +37,13 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:text="9h" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/tvUserName"
+        android:layout_alignBaseline="@+id/tvUserName"
+        android:textSize="10dp"
+        android:text="TextView" />
 </RelativeLayout>
