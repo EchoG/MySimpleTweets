@@ -25,7 +25,9 @@ public class TwitterClient extends OAuthBaseClient {
 	public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
 	public static final String REST_CONSUMER_KEY = "rq0aS5e3v5wN5jWwRe0TEf82Q";       // Change this
 	public static final String REST_CONSUMER_SECRET = "Bd0PFtgMEVwdv4dRvfjeFdqG6QsYuhQgcYPJ2uBHF9T0I4z0Ds"; // Change this
-    public static long max_id = 0;
+    public static long max_id_hometimeline = 0;
+	public static long max_id_mentiontimeline = 0;
+	public static long max_id_usertimeline = 0;
 
 	// Landing page to indicate the OAuth flow worked in case Chrome for Android 25+ blocks navigation back to the app.
 	public static final String FALLBACK_URL = "https://codepath.github.io/android-rest-client-template/success.html";
@@ -48,17 +50,39 @@ public class TwitterClient extends OAuthBaseClient {
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("count", 25);
-        if(max_id > 0){
-            params.put("max_id", max_id - 1);
+        if(max_id_hometimeline > 0){
+            params.put("max_id", max_id_hometimeline - 1);
         }
 		client.get(apiUrl, params, handler);
 	}
 
-	public void getCurrentUser(AsyncHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("account/verify_credentials.json");
+	public void getMentionsTimeline(AsyncHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/mentions_timeline.json");
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
+		params.put("count", 25);
+		if(max_id_mentiontimeline > 0){
+			params.put("max_id", max_id_mentiontimeline - 1);
+		}
 		client.get(apiUrl, params, handler);
+	}
+
+	public void getUserTimeline(String screenName, AsyncHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/user_timeline.json");
+		// Can specify query string params directly or through RequestParams.
+		RequestParams params = new RequestParams();
+		params.put("screen_name", screenName);
+		params.put("count", 25);
+		if(max_id_usertimeline > 0){
+			params.put("max_id", max_id_usertimeline - 1);
+		}
+		client.get(apiUrl, params, handler);
+	}
+
+	public void getUserInfo(AsyncHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("account/verify_credentials.json");
+		// Can specify query string params directly or through RequestParams.
+		client.get(apiUrl, null, handler);
 	}
 
 	public void newTweet(AsyncHttpResponseHandler handler, String status) {

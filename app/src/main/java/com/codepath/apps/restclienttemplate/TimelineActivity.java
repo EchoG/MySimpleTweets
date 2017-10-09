@@ -1,118 +1,69 @@
 package com.codepath.apps.restclienttemplate;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.codepath.apps.restclienttemplate.fragments.HomeTimelineFragment;
+import com.codepath.apps.restclienttemplate.fragments.TweetsListFragment;
+import com.codepath.apps.restclienttemplate.fragments.TweetsPagerAdapter;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.models.User;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import cz.msebera.android.httpclient.Header;
 
-public class TimelineActivity extends AppCompatActivity {
+public class TimelineActivity extends AppCompatActivity implements TweetsListFragment.TweetSelectedListener{
 
     TwitterClient client;
-    TweetAdapter tweetAdapter;
-    ArrayList<Tweet> tweets;
-    RecyclerView rvTweets;
+
     String screen_name;
     String user_name;
     String image;
 
-    private EndlessRecyclerViewScrollListener scrollListener;
+    User currentUser;
+
+    ViewPager vpPager;
+
+    HomeTimelineFragment homeTimelineFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
 
+        homeTimelineFragment = new HomeTimelineFragment();
+        // get the view pager
+        vpPager = (ViewPager) findViewById(R.id.viewpager);
+        // set the adapter for the pager
+        vpPager.setAdapter(new TweetsPagerAdapter(getSupportFragmentManager(), this, homeTimelineFragment));
+        // setup the TabLayout to use the view pager
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(vpPager);
+
         client = TwitterApp.getRestClient();
-
-        rvTweets = (RecyclerView) findViewById(R.id.rvTweet);
-        tweets = new ArrayList<>();
-        tweetAdapter = new TweetAdapter(tweets);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        rvTweets.setLayoutManager(linearLayoutManager);
-        rvTweets.setAdapter(tweetAdapter);
-
-        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                populateTimeline();
-            }
-        };
-
-        rvTweets.addOnScrollListener(scrollListener);
-
         getCurrentUser();
 
-        populateTimeline();
-    }
-
-    private void populateTimeline(){
-        client.getHomeTimeline(new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.d("TwitterClient", response.toString());
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                //Log.d("TwitterClient", response.toString());
-                for(int i = 0; i < response.length(); i++){
-                    try{
-                        Tweet tweet = Tweet.fromJSON(response.getJSONObject(i));
-                        tweets.add(tweet);
-                        tweetAdapter.notifyItemInserted(tweets.size() - 1);
-
-                        if(i == response.length() - 1){
-                            TwitterClient.max_id = tweet.uid;
-                        }
-
-                    }catch (JSONException e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d("TwitterClient", responseString);
-                throwable.printStackTrace();
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.d("TwitterClient", errorResponse.toString());
-                throwable.printStackTrace();
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                Log.d("TwitterClient", errorResponse.toString());
-                throwable.printStackTrace();
-            }
-        });
     }
 
     private void getCurrentUser(){
-        client.getCurrentUser(new JsonHttpResponseHandler() {
+        client.getUserInfo(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("TwitterClient", response.toString());
 
                 try{
+                    currentUser = User.fromJSON(response);
                     screen_name = response.get("screen_name").toString();
                     image = response.get("profile_image_url_https").toString();
 
@@ -150,8 +101,25 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_timeline, menu);
         return true;
+    }
+
+    public void onProfileView(MenuItem item) {
+        // launch the profile view
+        Intent i = new Intent(this, ProfileActivity.class);
+        i.putExtra("user", currentUser);
+        startActivity(i);
+    }
+
+    @Override
+    public void onTweetSelected(Tweet tweet) {
+        //Toast.makeText(this, tweet.body, Toast.LENGTH_SHORT).show();
+        // launch the profile view
+        User user = tweet.user;
+        Intent i = new Intent(this, ProfileActivity.class);
+        i.putExtra("user", user);
+        startActivity(i);
     }
 
     public void newTweet(MenuItem mi) {
@@ -172,8 +140,8 @@ public class TimelineActivity extends AppCompatActivity {
 
                         try{
                             Tweet tweet = Tweet.fromJSON(response);
-                            tweets.add(0, tweet);
-                            tweetAdapter.notifyItemInserted(0);
+                            homeTimelineFragment.addNewTweet(tweet);
+
                         }catch(JSONException e){
                             e.printStackTrace();
                         }
